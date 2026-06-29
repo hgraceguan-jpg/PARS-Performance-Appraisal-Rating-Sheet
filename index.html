@@ -976,7 +976,7 @@ textarea.field-input{resize:vertical;min-height:72px;}
 </div><!-- /form-wrap -->
 
 <script>
-const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbzGjkn3XnMbEtUDNAxalFdQhWFgYkY40hdvVSI05CtcWZlbJVvW6RMLfwQoRZzxhyPl_A/exec';
+const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbw_CIjnSnkGO7eceL7cSQSM6yaXBeAfoupxkjH33qrUh_WNkKxznOF8o31iEjaxr4U/exec';
 let CURRENT_ROLE=null;
 let ALL_IDS=[];
 
@@ -2852,8 +2852,8 @@ document.getElementById('appraisalForm').addEventListener('submit',function(e){
   const indicatorLabels={};
   ALL_IDS.forEach(id=>{
     const row=document.getElementById(id)?.closest('tr');
-    const cell=row?.querySelector('td');
-    indicatorLabels[id]=cell?cell.textContent.replace(/^\d+\.\s*/,'').trim():id;
+    const keyEl=row?.querySelector('.ind-key');
+    indicatorLabels[id]=keyEl?keyEl.textContent.trim():id;
   });
   payload.indicatorLabels=indicatorLabels;
 
@@ -3058,16 +3058,23 @@ window.addEventListener('beforeunload', function(e){
       });
       if(typeof updateScores === 'function') updateScores();
 
-      // 3) Banner so the user knows it auto-filled (no auto-submit on purpose
-      // — let them eyeball it then click Submit themselves, in case anything
-      // looks off they can stop before sending to Apps Script.)
+      // 3) Banner
       const heroMeta = document.querySelector('.hero .hero-meta');
       if(heroMeta){
         heroMeta.insertAdjacentHTML('beforeend',
           ' &nbsp;·&nbsp; <span style="background:#FFD400;color:#1F1F1F;padding:2px 8px;border-radius:4px;font-weight:800;font-size:11px;">AUTOFILLED — REVIEW & SUBMIT</span>');
       }
-      // Scroll to bottom so Submit is in view
-      setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}), 250);
+
+      // 4) Auto-submit if &autosubmit=1 is present in the URL
+      if(params.get('autosubmit') === '1'){
+        setTimeout(()=>{
+          const btn = document.getElementById('submitBtn');
+          if(btn) btn.click();
+        }, 900);
+      } else {
+        // Scroll to bottom so Submit is in view
+        setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}), 250);
+      }
     }, 300);
   }
 
@@ -3172,3 +3179,4 @@ function syncRemarkStars(textareaOrAll){
 </script>
 </body>
 </html>
+               
