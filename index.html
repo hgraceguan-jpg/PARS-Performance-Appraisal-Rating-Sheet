@@ -3162,4 +3162,9 @@ function syncRemarkStars(textareaOrAll){
   });
   // 'change' covers select dropdowns (Appraisal Period, DEV Position)
   document.addEventListener('change', function(e){
-    if(e.target && REQ_IDS.indexOf(e.target.id) !== -1) clearR
+    if(e.target && REQ_IDS.indexOf(e.target.id) !== -1) clearReq(e.target);
+  });
+})();
+</script>
+</body>
+</html>
