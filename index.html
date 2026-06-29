@@ -1627,6 +1627,26 @@ const ROLES = {
   }
 };
 
+// ── Part label map for detailed email ──
+const PART_LABELS = {
+  BAA:  { p1:{label:'Part I — Core Competencies',weight:'30%'},
+           p2:{label:'Part II — Functional Competencies',weight:'70%'} },
+  BAC:  { p1:{label:'Part I — Core Competencies',weight:'30%'},
+           p2:{label:'Part II — Functional Competencies',weight:'70%'} },
+  SRBAC:{ p1:{label:'Part I — Core Competencies',weight:'30%'},
+           p2:{label:'Part II — Functional Competencies',weight:'70%'} },
+  DEV:  { p1:{label:'Part I — Technical Competencies',weight:'50%'},
+           p2:{label:'Part II — Non-Technical & Compliance',weight:'20%'},
+           p3:{label:'Part III — Communication & Responsiveness',weight:'15%'},
+           p4:{label:'Part IV — Attitude & Professional Development',weight:'15%'} },
+  BAD:  { p1:{label:'Part I — Product & Feature Design Excellence',weight:'25%'},
+           p2:{label:'Part II — Documentation Quality & Compliance',weight:'20%'},
+           p3:{label:'Part III — Testing & Quality Assurance',weight:'15%'},
+           p4:{label:'Part IV — Support & Issue Resolution',weight:'15%'},
+           p5:{label:'Part V — Stakeholder Engagement',weight:'15%'},
+           p6:{label:'Part VI — Professional Development',weight:'10%'} }
+};
+
 // ── Two-level navigation ──
 function showTeams(){
   document.getElementById('team-picker-level').style.display='block';
@@ -2857,6 +2877,22 @@ document.getElementById('appraisalForm').addEventListener('submit',function(e){
   });
   payload.indicatorLabels=indicatorLabels;
 
+  // Build partStructure so Apps Script can render the full detailed email
+  const roleData=ROLES[CURRENT_ROLE]||{};
+  const rolePartMap=PART_LABELS[CURRENT_ROLE]||{};
+  const partStructure={};
+  ['p1','p2','p3','p4','p5','p6'].forEach(pk=>{
+    if(!roleData[pk])return;
+    const pInfo=rolePartMap[pk]||{label:pk,weight:''};
+    const cats={};
+    Object.keys(roleData[pk]).forEach(ck=>{
+      // Strip leading letter prefix like "A. " for cleaner display
+      cats[ck]=(roleData[pk][ck].name||ck).replace(/^[A-Z]\d?\.\s*/,'');
+    });
+    partStructure[pk]={label:pInfo.label,weight:pInfo.weight,categories:cats};
+  });
+  payload.partStructure=partStructure;
+
   // Generate the reference number BEFORE submission so it can be sent to
   // Apps Script (written to the Sheet and shown in the email) and also
   // shown on the success screen — guaranteeing consistency.
@@ -3126,57 +3162,4 @@ function syncRemarkStars(textareaOrAll){
   });
   // 'change' covers select dropdowns (Appraisal Period, DEV Position)
   document.addEventListener('change', function(e){
-    if(e.target && REQ_IDS.indexOf(e.target.id) !== -1) clearReq(e.target);
-  });
-})();
-
-
-
-
-
-
-
-</script>
-
-<!-- ── STICKY ACTION BAR — always-visible Submit (mirrors bottom buttons) ── -->
-<div id="sticky-action-bar">
-  <div class="sab-status">
-    <span id="sab-status-text">Complete all indicators to enable submit</span>
-  </div>
-  <button type="button" class="btn btn-outline" onclick="saveDraft()">Save Draft</button>
-  <button type="button" class="btn btn-outline" onclick="savePDF()">Save as PDF</button>
-  <button type="button" class="btn btn-primary" id="stickySubmitBtn" onclick="document.getElementById('submitBtn').click()">Submit Appraisal</button>
-</div>
-
-<script>
-// ── Show/hide sticky bar when form is active ──
-(function(){
-  function syncStickyBar(){
-    const bar = document.getElementById('sticky-action-bar');
-    const wrap = document.getElementById('form-wrap');
-    const form = document.getElementById('appraisalForm');
-    if(!bar || !wrap || !form) return;
-    const formVisible = wrap.style.display === 'block' && form.style.display !== 'none';
-    bar.classList.toggle('show', formVisible);
-    if(formVisible) wrap.setAttribute('data-active','1'); else wrap.removeAttribute('data-active');
-  }
-  // Run whenever DOM changes that could affect visibility
-  const obs = new MutationObserver(syncStickyBar);
-  document.addEventListener('DOMContentLoaded', function(){
-    const wrap = document.getElementById('form-wrap');
-    if(wrap) obs.observe(wrap, { attributes:true, attributeFilter:['style'] });
-    syncStickyBar();
-  });
-  // Update sticky bar status text when ratings change
-  document.addEventListener('change', function(){
-    const lbl = document.getElementById('progress-bar-label');
-    const st = document.getElementById('sab-status-text');
-    if(lbl && st && document.getElementById('sticky-action-bar').classList.contains('show')){
-      st.innerHTML = '<strong>' + lbl.textContent + '</strong>';
-    }
-  });
-})();
-</script>
-</body>
-</html>
-               
+    if(e.target && REQ_IDS.indexOf(e.target.id) !== -1) clearR
