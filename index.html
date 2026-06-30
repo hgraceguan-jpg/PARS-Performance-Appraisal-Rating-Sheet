@@ -7,7 +7,7 @@
 <style>
 :root{--red:#CC0000;--red-dark:#A50000;--red-deep:#7A0000;--red-light:#FFF0F0;--red-mid:#FFD6D6;--black:#111111;--charcoal:#1F1F1F;--gray-dark:#3A3A3A;--gray:#6B6B6B;--border:#E2E2E2;--bg:#ECECEC;--white:#fff;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--black);font-size:13px;}
+body{font-family:'Inter','Segoe UI',sans-serif;backgroundh:var(--bg);color:var(--black);font-size:13px;}
 
 /* ── ROLE PICKER ── */
 #role-picker{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;}
@@ -2925,7 +2925,7 @@ document.getElementById('appraisalForm').addEventListener('submit',function(e){
     document.querySelector('.btn-row').style.display='none';
     // Hide the sticky bar on the success screen — submission is complete
     const sab=document.getElementById('sticky-action-bar');
-    if(sab) sab.classList.remove('show');
+    if(sab){ sab.classList.remove('show'); sab.style.display='none'; }
     const n=document.getElementById('empName').value.trim();
     document.getElementById('suc-title').textContent=(n?n+"'s ":"")+'Appraisal Submitted!';
     document.getElementById('suc-ref-code').textContent=refCode;
